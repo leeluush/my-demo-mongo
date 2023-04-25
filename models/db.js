@@ -17,11 +17,12 @@ async function connect() {
         require('./todo.js')
         require('./post.js')
         require('./category.js')
+        require('./user-token.js')
 
         console.log('connection to mongo succeed');
     } catch (err) { 
-        console.log(err)
-        console.log('failed to connect to mongo')
+      
+        console.log(`failed to connect to mongo ${err}`)
         process.exit(1);
     }
 

@@ -5,12 +5,11 @@ const cookieParser = require('cookie-parser');
 
 const router = require('./routes/index')
 
-const { isObjectIdOrHexString } = require('mongoose');
 const app = express()
 
 connect();
 
-app.unsubscribe(cookieParser())
+app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 

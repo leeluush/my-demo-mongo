@@ -1,64 +1,90 @@
 const Post = require('../models/post');
 
 async function getPosts(req, res) {
-    try{
-    const posts = await Post
-        .find({})
-        .sort('-created')
-        .limit(50)
-        .select('author category title created')
-        .populate('category')
-        .populate('author', 'fullName username')
+  try {
 
-        .exec();
+    const posts = await Post
+      .find({author: req.user._id})
+      .sort('-created')
+      .limit(50)
+      .select('author category title created')
+      .populate('category')
+      .populate('author', 'fullName username')
+
+      .exec();
 
     res.json(posts);
-} catch (error) {
-    console.error(error);        
-    res.status(500).json({ message: 'Failed to fetch posts' });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json ({ message: error.message });
 
-}
+  }
 }
 
 async function getSinglePost(req, res) {
-    try {
-        const postId = req.params.postId;
-        const post = await Post.findOne({ _id: postId }).exec();
+  try {
+    const postId = req.params.postId;
+    const post = await Post
+    .findOne({_id: postId, author: req.user._id})
+    .exec();
 
-        res.json(post);
-    } catch {
-        console.log(err)
-        res.status(500).json({ message: 'server error' })
-    }
+    res.json(post);
+  } catch (error){
+    console.log(error)
+    res.status(500).json ({ message: error.message });
+  }
 }
 
 async function createPost(req, res) {
-    const body = req.body;
-    console.log(req.body)
-    const post = new Post(body);
+  const body = req.body;
+  const post = new Post(body);
 
-    try {
-        await post.save();
-        res.json(post)
-    } catch (err) {
+  post.author = req.user._id;
 
-        res.status(500).json({ message: err.message});
-        return;
-    }
+  try {
+    await post.save();
+    res.json(post)
+  } catch (error) {
+    res.status(500).json ({ message: error.message });
+}
 }
 
-function removePost() {
+
+async function removePost(req,res) {
+  try {
+    const postId = req.params.postId;
+    const post = await Post
+    .deleteOne({_id: postId, author: req.user._id})
+    .exec()
+    res.send('removed')
+
+    } catch (error) {
+    res.status(500).send(error.message);
+    
+  }
 
 }
 
-function updatePost() {
 
+async function updatePost(req,res) {
+  try {
+    const postId = req.params.postId;
+    const content = req.body.content;
+    const post = await Post.updateOne(
+      {_id: postId, author: req.user._id },
+      { $set: { content: content }}).exec();
+    res.send(content)
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 }
+
+
 
 module.exports = {
-    getPosts,
-    getSinglePost,
-    createPost,
-    removePost,
-    updatePost
+  getPosts,
+  getSinglePost,
+  createPost,
+  removePost,
+  updatePost
 }

@@ -1,0 +1,12 @@
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDJmZWViZDRjNDNjNTA1ZTEyODlkZTUiLCJlbWFpbCI6InRheWxvckBzd2lmdC5jb20iLCJmaXJzdE5hbWUiOiJ0YXlsb3IiLCJsYXN0TmFtZSI6InN3aWZ0IiwiaWF0IjoxNjgyMDA3NTE5LCJleHAiOjE2ODIwMTExMTl9.42FAdlmIFIx8HalDb7-LIoPiMKQFVs2WW_Z8rrv027A",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7Il9pZCI6IjY0MmZlZWJkNGM0M2M1MDVlMTI4OWRlNSIsImVtYWlsIjoidGF5bG9yQHN3aWZ0LmNvbSIsImZpcnN0TmFtZSI6InRheWxvciIsImxhc3ROYW1lIjoic3dpZnQifSwiaWRlbnRpZmllciI6IjAuMTQ0MjgzOTYxMDQzMjU2IiwiaWF0IjoxNjgyMDA3NTE5LCJleHAiOjE2ODk3ODM1MTl9.t7ubTgb0kkz1teS4fTwaVzAiYbHiPUAiACLZYpQuq9Y",
+    "payload": {
+        "user": {
+            "_id": "642feebd4c43c505e1289de5",
+            "email": "taylor@swift.com",
+            "firstName": "taylor",
+            "lastName": "swift"
+        }
+    }
+}

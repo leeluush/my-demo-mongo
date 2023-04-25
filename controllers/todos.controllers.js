@@ -1,75 +1,101 @@
 const Todo = require('../models/todo');
 
 
-async function getTodo (req,res) {
+async function getAllToDo(req, res) {
     try {
-        const todo = await Todo.findOne({
-            _id: req.params.todoId
-        }).exec();
+        const todos = await Todo
+        .find({user: req.user._id})
+        .exec();
+        res.json(todos)
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+async function getTodo(req, res) {
+    try {
+        const todoId = req.params.todoId;
+        const todo = await Todo
+        .findOne({_id: todoId, user: req.user._id})
+        .exec();
 
         res.json(todo);
-    } catch{
-        res.status(500).json({message: 'server error'})
-    }
-}
-
- async function createTodo (req, res) {
-    const todo = await new Todo();
-    todo.task = "my new task form node";
-    todo.isDone = false;
-    todo.user = "lee";
-    try {
-        await todo.save();
-
-        res.send('created!')
     } catch (error) {
-        res.send(error)
+        res.status(500).json ({ message: error.message });
     }
-
 }
 
-// deletes all to dos 
+async function createTodo(req, res) {
+    try {
+      const { content, isDone, task, category, priority } = req.body;
+      const userId = req.user._id;
+      const created = new Date();
+  
+      const todo = new Todo({
+     
+        userId,
+        content,
+        isDone: false,
+        user: userId,
+        task,
+        category,
+        priority,
+        created,
+        updated: null
+      });
+  
+      await todo.save();
+  
+      res.json({ message: 'New todo created!', todo });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+
+  async function deleteToDo(req, res) {
+    try {
+        const todoId = req.params.todoId
+        const todo = await Todo
+        .deleteOne({ _id: todoId, user:req.user._id })
+        .exec()
+        res.json({ message: 'Todo ', todo });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 
 async function deleteAllToDos(req, res) {
     try {
-        await Todo.deleteMany({ user: 'lee' });
-        res.send('removed')
+        const userId = req.userId;
+        await Todo
+        .deleteMany({user: userId})
+        res.send('All todos removed')
     } catch (error) {
-        res.send(error)
+        res.status(500).json({ message: error.message });
+      }
     }
 
-}
 
- async function deleteToDo (req, res) {
-    try {
-        await Todo.deleteOne({ user: 'lee' });
-        res.send('removed')
-    } catch (error) {
-        res.send(error)
+
+    async function updateToDo(req, res) {
+        try {
+            const todoId = req.params.todoId;
+            const updateFields = req.body;
+    
+            await Todo
+            .updateOne({ _id: todoId, user: req.user._id },
+             { $set: updateFields, $currentDate: { updated: true } });
+
+            const updatedTodo = await Todo
+            .findOne({ _id: todoId, user: req.user._id })
+            .exec();
+            res.send('Todo updated');
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     }
 
-}
-
-
-async function updateToDo (req, res)  {
-    try {
-        await Todo.updateOne({ _id: isObjectId("") }, { $set: { task: String } })
-        res.send('updated')
-    } catch (error) {
-        res.send(error)
-    }
-}
-
-
-async function getAllToDo (req, res)  {
-
-    try {
-        const todos = await Todo.find({})
-        res.json({ todos })
-    } catch (error) {
-        res.send(error)
-    }
-}
 
 module.exports = {
     getTodo,
