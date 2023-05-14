@@ -1,6 +1,9 @@
 const router = require('express').Router(); 
 const controller = require('../controllers/posts.controllers')
 const verifyUser = require("../middlewares/verify-user");
+const multer = require('multer');
+
+const upload = multer ({dest: 'upload/'})
 
 router.get('/api/posts', verifyUser, controller.getPosts);
 router.get('/api/posts/:postId', verifyUser, controller.getSinglePost);

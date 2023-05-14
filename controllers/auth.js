@@ -2,11 +2,12 @@ const User = require("../models/user");
 const { encode, verifyRefreshToken } = require("../services/jwt.service");
 const UserToken = require("../models/user-token");
 const bcrypt = require("bcrypt");
+const ninetyDays =  90 * 24 * 60 * 60 * 1000
 
 
 
 async function login(req, res) {
-  const { email, password } = req.body;
+  const { email, password, userName} = req.body;
   try {
     const user = await User.findOne({
       email: email,
@@ -18,9 +19,11 @@ async function login(req, res) {
       if (!isPasswordCorrect) {
         return res.status(401).json({ message: 'not authorized' });
       }
-      const { identifier, ...tokens } = encode(user.toObject());
 
-      res.cookie('access_token', tokens.access_token, { httpOnly: true, maxAge: 1000 * 60 * 60, path: '/api' })
+      //todo fix the values 
+      const { identifier, ...tokens } = encode({email, firstName, lastName, birthdate, userId});
+
+      res.cookie('token', tokens.refresh_token, { httpOnly: true, maxAge: ninetyDays, path: '/api' })
 
       const userToken = new UserToken({
         user: user._id,
@@ -30,9 +33,16 @@ async function login(req, res) {
       await userToken.save();
 
       res.json({
-        ...tokens,
+
         payload: {
-          user,
+          user: {
+            //todo fix the values 
+            firstName,
+            lastName,
+            email,
+            birthdate
+            
+          },
         }
       });
     } else {
@@ -96,6 +106,8 @@ async function register(req, res) {
   const { firstName, lastName, email, password, birthdate } = req.body;
   const hash = bcrypt.hashSync(password, 5)
 
+  //to do add login 
+
   try {
     const user = new User({
       firstName,
@@ -113,7 +125,7 @@ async function register(req, res) {
 
 
 async function getUserInfo(req, res) {
-  const userId = req.params.id
+  const userId = req.user.userId
   try {
     const user = await User.findById(userId)
       .select('firstName lastName email birthdate')
@@ -125,7 +137,7 @@ async function getUserInfo(req, res) {
       res.status(404).json({ message: 'User not found' })
     }
   } catch {
-    res.status(500).json({ messag: 'Failed to get user info' });
+    res.status(500).json({ message: 'Failed to get user info' });
   }
 }
 
